@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Tucil 3 stima: Algoritma A*</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+</head>
+  
+<body>
+    <h3>Menari Jalan dengan Algoritma A*</h3>
+    <input type="file" name="inputfile" id="inputfile">
+    <br>
+    <label></label>depature point : </label>
+    <select style="margin-top: 10px;" name = "depatureNode" id = "depatureNode" >
+
+    </select>
+
+    <br>
+    <label></label>destination point : </label>
+    <select style="margin-top: 10px;" name = "destinationNode" id = "destinationNode" >
+
+    </select>
+    <br>
+    <button type="button" onclick="klik()" style="margin-top: 20px;">cari rute terdekat !</button>
+
+    <br>
+    <pre id="output"></pre>
+    <br>
+    <div id="googleMap" style="margin-top:20px;width:100%;height:400px;"></div>
+
+    <script type="text/javascript" src="../src/tucil2.js"></script>
+</body>
+  
+</html>
