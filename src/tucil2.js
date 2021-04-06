@@ -18,11 +18,11 @@ function bacaTxt(result){
         }
         for(i=1+nNode;i<=2*nNode;i++){
             const t = temp[i].split(' ')
-            if(t.length!=nNode) throw "matriks ketetanggaan harus matriks persegi"
+            if(t.length!=nNode) throw "Matriks ketetanggaan harus matriks persegi"
             let counter = 0
             t.forEach((isFriend)=>{
                 if(isNaN(isFriend) || !(Number(isFriend)<=1 && Number(isFriend)>=0)){
-                    throw "matriks should be in number 1 and 0 only"
+                    throw "Matriks hanya bisa 0 atau 1 saja"
                 }
                 if(Number(isFriend)==1){
                     myGraf.addFriend(myGraf.getNodebyIndex(i-1-nNode).value, myGraf.getNodebyIndex(counter).value)
