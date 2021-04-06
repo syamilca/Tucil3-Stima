@@ -1,4 +1,4 @@
-mapboxgl.accessToken = 'pk.eyJ1Ijoic3BlY2lhbG9uZTE2IiwiYSI6ImNramN0enVlZzJjMDYycXA5bXJ1OXE2bTcifQ.aTWG4bxIEgemZu-9xJ9i6w'
+mapboxgl.accessToken = 'pk.eyJ1IjoiaGFmaWRhYmkiLCJhIjoiY2tuNXZ2N25uMDg1MjJyczlna3VndmFmNSJ9.VKoc34AfkqZ5uUUODIUBVA'
 let dept = ""
 let dest = ""
 let myGraf = new Graph()
@@ -212,12 +212,22 @@ document.getElementById("depatureNode").addEventListener("change",function(){
             }
         }
         document.getElementById("destinationNode").innerHTML = destination
+        document.getElementById("daftarHeuristik").innerHTML = ""
+        document.getElementById("tujuanSaya").textContent = "-"
     }
 },false)
 
 document.getElementById("destinationNode").addEventListener("change",function(){ 
     if(this.value!='0'){
         dest = String(this.value).replace('\n','').trim()
+        let tmp = ""
+        const heuristikObj = myGraf.getHeuristicArray(dest)
+        const listPoint = Object.keys(heuristikObj)
+        listPoint.forEach((poin)=>{
+            tmp = tmp + "<tr>" + "<td>" + poin+ "</td>" + "<td>" + heuristikObj[poin].toFixed(2) + "</td>" + "</tr>"
+        })
+        document.getElementById("daftarHeuristik").innerHTML = tmp
+        document.getElementById("tujuanSaya").textContent = dest
     }
 },false)
 
