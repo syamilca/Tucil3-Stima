@@ -34,19 +34,19 @@ function bacaTxt(result){
         muatPeta2()
         //document.getElementById("output").textContent = "ACC"
     }else{
-        throw "error. cek format testcase sesuai dengan readme!"
+        throw "Error. Cek format testcase sesuai dengan readme!"
     }
     console.log(myGraf)
 }
 
 function klik(){
     if(dept===dest){
-        document.getElementById("output").textContent = "tidak boleh dept==dest !"
+        document.getElementById("output").textContent = "Departure dan destination tidak boleh sama!"
     }else{
         try{
             haha = a_star(dept,dest)
             setDirectionOnMap(haha.rute)
-            document.getElementById("output").innerHTML = haha.rute+"<br>jarak = "+haha.totalJarak
+            document.getElementById("output").innerHTML = haha.rute.join(" -> ") +"<br>Jarak total = "+haha.totalJarak + " meter"
         }catch(err){
             document.getElementById("output").textContent = err
         }
