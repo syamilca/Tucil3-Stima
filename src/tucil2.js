@@ -41,17 +41,14 @@ function bacaTxt(result){
 
 function klik(){
     if(dept===dest){
-        console.log("error, depature harus != destination")
+        document.getElementById("output").textContent = "tidak boleh dept==dest !"
     }else{
         try{
-            const grafduplikat = myGraf
-            haha = a_star(grafduplikat,dept,dest)
-            setDirectionOnMap(haha.rute,dept,dest)
-            console.log(haha)
-            document.getElementById("output").innerHTML = haha.rute+"<br>"+haha.heuristik+"<br>jarak = "+haha.jarak
+            haha = a_star(dept,dest)
+            setDirectionOnMap(haha.rute)
+            document.getElementById("output").innerHTML = haha.rute+"<br>jarak = "+haha.totalJarak
         }catch(err){
             document.getElementById("output").textContent = err
-            console.log(err)
         }
     }
 }
@@ -242,81 +239,82 @@ document.getElementById('inputfile').addEventListener('change', function()
 
 /**
  * 
- * @param {Graph} graf 
  * @param {string} start 
  * @param {string} destination 
  */
- function a_star(graf,start,destination){
-    let distanceResult = 0
-    let route = [start]
-    let bannedNode = []
-    let isSuccess = false
-    let isFail  = false
-    let heuristik = graf.getHeuristicArray(destination)
-    //CHECK START AND DESTINATION ARE ON GRAF
-    if(!graf.isExist(start)||!graf.isExist(destination)) throw "node tujuan/awalan tidak pernah ada disistem!"
-    //DOIN A_STAR
-    while(!isSuccess && !isFail){
-        let tempNode = graf.getNodebyValue(start)
-        let flag = true
-        while(flag){
-            //CEK TETANGGA DAN HAPUS TETANGGA YANG SUDAH ADA PADA ROUTE or BANNED NODE
-            route.forEach((r)=>{tempNode.deleteFriend(r)})
-            bannedNode.forEach((r)=>{tempNode.deleteFriend(r)})
+ function a_star(start,destination){
+    let heuristik = myGraf.getHeuristicArray(destination)
+    if((myGraf.isExist(start)&&myGraf.isExist(destination))==false) throw "titik start/destination tidak terdefinisi"
+    let rute = [start]
+    let banned = []
+    let fail = false
 
-            //CEK APAKAH ADA TETANGGA MINIMAL 1
-            if(tempNode.friends.length>0)
-            //JIKA ADA CARI TERPENDEK
-            {
-                let tNode2 = graf.getNodebyValue(tempNode.friends[0].value)
-                let tJarak =  tempNode.friends[0].jarak + heuristik[graf.searchNode(tempNode.friends[0].value)]
-                for(let x = 1; x<tempNode.friends.length;x++){
-                    if(tempNode.friends[x].value==destination){
-                        tJarak = tempNode.friends[x].jarak + heuristik[graf.searchNode(tempNode.friends[x].value)]
-                        tNode2 = graf.getNodebyValue(tempNode.friends[x].value)
-                        break
-                    }else if(tempNode.friends[x].jarak + heuristik[graf.searchNode(tempNode.friends[x].value)] < tJarak){
-                        tJarak = tempNode.friends[x].jarak + heuristik[graf.searchNode(tempNode.friends[x].value)]
-                        tNode2 = graf.getNodebyValue(tempNode.friends[x].value)
-                    }
-                }
-                distanceResult = distanceResult + tJarak
-                console.log(distanceResult)
-                route.push(tNode2.value)
-                if(tNode2.value===destination){
-                    isSuccess=true
-                    flag = false
-                }else{
-                    tempNode = tNode2
-                }
+    let c = 0
+    while(!fail && !rute.includes(destination)){
+        let temp = a_star_helper1(rute,banned,rute[rute.length-1],heuristik)
+        rute = temp.rute
+        banned = temp.banned
+        if(rute.length==0){
+            fail = true
+        }
 
-            }else
-            //JIKA TIDAK ADA 
-            {
-                flag = false
-                if(route.length<=1){
-                    isFail = true
-                }else{
-                    bannedNode.push(tempNode.value)
-                    tempNode = graf.getNodebyValue(route[route.length-2])
-                    distanceResult = distanceResult - graf.getNodebyValue(route[route.length-2]).getWeight(route[route.length-1])
-                    route = deleteArray(route,route[route.length-1])
-                }
+        //PENGAMAN DARI INFINITIE LOOPING
+        c++
+        if(c>myGraf.numOfNodes*2){fail=true}
+    }
+
+    if(fail) throw "tidak dapat dilakukan A*"
+    else return{
+        'start' : start,
+        'destination' : destination,
+        'rute' :   rute,
+        'totalJarak' : sumJarak(rute)
+    }
+
+}
+
+/**
+ * 
+ * @param {Array} rute 
+ * @param {Array} banned 
+ * @param {string} currNode
+ */
+function a_star_helper1(rute, banned,currNode, heuristik){
+    let cnode = myGraf.getNodebyValue(currNode)
+    let candidates = []
+    cnode.friends.forEach((f)=>{
+        if(!(rute.includes(f.value) || banned.includes(f.value))){
+            candidates.push(f)
+        }
+    })
+    if(candidates.length>0){
+        let nextNode = candidates[0]
+        for(let x=1;x<candidates.length;x++){
+            let cName = candidates[x].value
+            let cJarak = candidates[x].jarak
+            //console.log([cJarak+heuristik[cName]])
+            //console.log(nextNode.jarak + heuristik[nextNode.value])
+            if(cJarak + heuristik[cName] < nextNode.jarak + heuristik[nextNode.value]){
+                //console.log([cJarak,heuristik[cName]])
+                nextNode = candidates[x]
             }
         }
-    }
-
-    if(isSuccess){
+        //console.log(candidates)
+        //console.log(nextNode)
+        rute.push(nextNode.value)
+        //console.log(rute)
         return {
-            'rute' : route,
-            'jarak' : distanceResult,
-            'heuristik' : heuristik
+            'rute' : rute,
+            'banned' : banned
         }
     }else{
-        throw "gagal melakukan A*, coba cek graf anda sekali lagi  :)"
+        rute = deleteArray(rute,rute[rute.length-1])
+        banned.push(currNode)
+        return{
+            'rute' : rute,
+            'banned' : banned
+        }
     }
-   
-
 }
 
 /**
@@ -332,5 +330,19 @@ function deleteArray(oldArray, key){
         }
     })
     return newArray
+}
+
+/**
+ * 
+ * @param {Array} rute 
+ */
+function sumJarak(rute){
+    let s = 0
+    for(let x=1;x<rute.length;x++){
+        let pa = myGraf.getNodebyValue(rute[x])
+        let pb = myGraf.getNodebyValue(rute[x-1])
+        s = s + myGraf.getHaversine({lat:pa.lat , long :pa.long},{lat: pb.lat, long :pb.long})
+    }
+    return s
 }
 

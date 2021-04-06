@@ -1,4 +1,4 @@
-class Node {
+class Nodee {
     constructor(value,lat,long){
         this.value = value.trim();
         this.long = long
@@ -78,11 +78,16 @@ class Graph {
     }
     addNode(val, nodeLat, nodeLong){
         if (!this.isExist(val)){
-            let newNode = new Node(val, nodeLat, nodeLong)
+            let newNode = new Nodee(val, nodeLat, nodeLong)
             this.nodes.push(newNode)
             this.numOfNodes++;
         }
     }
+    /**
+     * 
+     * @param {string} nodeId 
+     * @param {string} friendId 
+     */
     addFriend(nodeId, friendId){
         if(this.isExist(nodeId) && this.isExist(friendId)){
             let i = this.searchNode(nodeId)
@@ -90,9 +95,19 @@ class Graph {
             this.nodes[i].addFriend(this.nodes[j].value, this.nodes[j].lat, this.nodes[j].long)
         }
     }
+    /**
+     * 
+     * @param {string} val 
+     * @returns {Nodee}
+     */
     getNodebyValue(val){
         return this.nodes[this.searchNode(val)];
     }
+    /**
+     * 
+     * @param {Number} index 
+     * @returns  {Nodee}
+     */
     getNodebyIndex(index){
         if(index>=0 && index<this.numOfNodes){
             return this.nodes[index]
@@ -100,11 +115,11 @@ class Graph {
         return 0
     }
     getHeuristicArray(dest){
-        let res = []
+        let res = {}
         if(this.isExist(dest)){
             let dnode = this.getNodebyValue(dest)
             this.nodes.forEach((node)=>{
-                res.push(this.getHaversine({lat:node.lat,long:node.long},{lat:dnode.lat,long:dnode.long}))
+                res[node.value] = this.getHaversine({lat:node.lat,long:node.long},{lat:dnode.lat,long:dnode.long})
             })
         }
         return res
