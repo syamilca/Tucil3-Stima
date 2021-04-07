@@ -30,8 +30,8 @@ NB : Untuk mengganti file input, refresh website terlebih dahulu
 
 ## Code Examples
 Format input file text :
-`11 <br /> -6.887221 107.611479 Segitiga_Dayang_Sumbi <br /> -6.887825 107.608051 Batan <br /> -6.893890 107.608442 Bonbin <br /> -6.893188 107.610418 Kubus <br /> -6.893731 107.612864 Borromeus <br /> -6.885551 107.611683 CircleK <br /> 
--6.885098 107.613549 Mcd_Dago <br /> -6.884972 107.611512 Baksil <br /> -6.887387 107.613599 Dago <br /> -6.885175 107.609949 Saraga <br /> -6.890154 107.613099 SPBU_Dago <br /> 0 1 0 0 0 1 1 0 1 0 0 <br /> 1 0 1 0 0 0 0 0 0 0 0 <br /> 0 1 0 1 0 0 0 0 0 0 0 <br /> 0 0 1 0 1 0 0 0 0 0 0 <br /> 0 0 0 1 0 0 0 0 0 0 1 <br /> 1 0 0 0 0 0 0 1 0 0 0 <br /> 1 0 0 0 0 0 0 1 1 0 0 <br /> 0 0 0 0 0 1 1 0 0 1 0 <br /> 1 0 0 0 0 0 1 0 0 0 1 <br /> 0 0 0 0 0 0 0 1 0 0 0 <br /> 0 0 0 0 1 0 0 0 1 0 0`
+``11 <br /> -6.887221 107.611479 Segitiga_Dayang_Sumbi <br /> -6.887825 107.608051 Batan <br /> -6.893890 107.608442 Bonbin <br /> -6.893188 107.610418 Kubus <br /> -6.893731 107.612864 Borromeus <br /> -6.885551 107.611683 CircleK <br /> 
+-6.885098 107.613549 Mcd_Dago <br /> -6.884972 107.611512 Baksil <br /> -6.887387 107.613599 Dago <br /> -6.885175 107.609949 Saraga <br /> -6.890154 107.613099 SPBU_Dago <br /> 0 1 0 0 0 1 1 0 1 0 0 <br /> 1 0 1 0 0 0 0 0 0 0 0 <br /> 0 1 0 1 0 0 0 0 0 0 0 <br /> 0 0 1 0 1 0 0 0 0 0 0 <br /> 0 0 0 1 0 0 0 0 0 0 1 <br /> 1 0 0 0 0 0 0 1 0 0 0 <br /> 1 0 0 0 0 0 0 1 1 0 0 <br /> 0 0 0 0 0 1 1 0 0 1 0 <br /> 1 0 0 0 0 0 1 0 0 0 1 <br /> 0 0 0 0 0 0 0 1 0 0 0 <br /> 0 0 0 0 1 0 0 0 1 0 0``
 
 Catatan :
 - Angka baris pertama merupakan jumlah nodes atau simpul
