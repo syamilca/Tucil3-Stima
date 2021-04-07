@@ -40,17 +40,28 @@ function bacaTxt(result){
 }
 
 function klik(){
-    if(dept===dest){
-        document.getElementById("output").textContent = "Departure dan destination tidak boleh sama!"
+    if(dept===dest || dept==="0" || dest==="0"){
+        document.getElementById("output").textContent = "tidak boleh dept==dest !"
     }else{
         try{
             haha = a_star(dept,dest)
-            setDirectionOnMap(haha.rute)
-            document.getElementById("output").innerHTML = haha.rute.join(" -> ") +"<br>Jarak total = "+haha.totalJarak + " meter"
+            setDirectionOnMap(haha.rute,dept,dest)
+            document.getElementById("output").innerHTML = haha.rute+"<br>jarak = "+haha.totalJarak
+            
+            let tampilKeun = '<strong>total distance = '+haha.totalJarak.toFixed(2)+' m</strong><ol class="list-group list-group-numbered">'
+            const warna = ["list-group-item-primary","list-group-item-danger","list-group-item-warning","list-group-item-success"]
+            for(let x =0; x<haha.rute.length;x++){
+                let tmp = '<li href="#" class="list-group-item ' + warna[x%4] + '">'+ '<div class="ms-2 me-auto"><div class="fw-bold">'+ (x+1)+'. '+haha.rute[x] +'</div>'+ haha.rute[x] +'</div>' +'</li>'
+                tampilKeun = tampilKeun + tmp
+            }
+
+            document.getElementById("output").innerHTML = tampilKeun+"</ol>"
+            return true
         }catch(err){
             document.getElementById("output").textContent = err
         }
     }
+    return false
 }
 
 function muatPeta2(){
@@ -88,11 +99,14 @@ function muatPeta2(){
         let counter = 1
         mapLine.forEach((dataKoordinat) => {
             const n = 'garis'+counter
+
+            //SOURCE UNTUK LINE ANTAR DUA TITIK
             myMap.addSource(n, {
                 'type' : 'geojson',
                 'data' : dataKoordinat
             })
 
+            //LAYER UNTUK LINE ANTAR DUA TITIK
             myMap.addLayer({
                 'id': n,
                 'type': 'line',
@@ -106,26 +120,10 @@ function muatPeta2(){
                     'line-width': 3
                 }
             })
-
-            myMap.addLayer({
-                "id": "jarak2titik-"+counter,
-                "type": "symbol",
-                "source": n,
-                "layout": {
-                  "symbol-placement": "line-center",
-                  "text-font": ["Open Sans Regular"],
-                  "text-field": '{title}',
-                  "text-size": 13,
-                  "text-rotate": -4,
-                  "symbol-spacing": 1,
-                },
-                "paint":{
-                  "text-translate":[0,-40],
-                }
-              })
             counter++
         })
 
+        //SOURCE UNTUK RUTE DARI TITIK A KE TITIK B
         myMap.addSource('directions',{
             'type' : 'geojson',
             'data' : {
@@ -137,22 +135,24 @@ function muatPeta2(){
                 
             }
         })
-
+        //LAYER UNTUK RUTE DARI TITIK A KE TITIK B
         myMap.addLayer({
             'id': 'directions',
             'source': 'directions',
             'type': 'line',
             'paint': {
                 'line-width': 4,
-                'line-color': '#f013b1'
+                'line-color': '#1ce83e'
             }
         })
 
+        //SOURCE UNTUK POINT LOKASI
         myMap.addSource('places', {
             'type': 'geojson',
             'data': lokasi
             });
-
+        
+        //LAYER UNTUK POINT LOKASI
         myMap.addLayer({
             'id': 'poi-labels',
             'type': 'symbol',
@@ -168,10 +168,110 @@ function muatPeta2(){
                 'text-color' : '#556fe0'
             }
         });
+
+        //LAYER UNTUK ANIMASI
+        myMap.addSource('animasi',{
+            'type' : 'geojson',
+            'data' : {
+                'type': 'FeatureCollection',
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'properties': {},
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': []
+                        }
+                    }
+                ]                
+            }
+        })
+        myMap.addLayer({
+            'id' : 'animasi',
+            'source' : 'animasi',
+            'type' : 'symbol',
+            'layout': {
+                'icon-image': 'airport-15',
+                'icon-rotate': ['get', 'bearing'],
+                'icon-rotation-alignment': 'map',
+                'icon-allow-overlap': true,
+                'icon-ignore-placement': true
+            }
+        })
+
+        //LAYER UNTUK JARAK ANTAR DUA TITIK
+        counter = 1
+        mapLine.forEach((dataKoordinat)=>{
+            const n = 'garis'+counter
+            //LAYER UNTUK JARAK ANTAR DUA TITIK
+            myMap.addLayer({
+                "id": "jarak2titik-"+counter,
+                "type": "symbol",
+                "source": n,
+                "layout": {
+                  "symbol-placement": "line-center",
+                  "text-font": ["Open Sans Regular"],
+                  "text-field": '{title}',
+                  "text-size": 14,
+                  "text-rotate": -3,
+                  "symbol-spacing": 1,
+                },
+                "paint":{
+                  "text-translate":[0,-30],
+                }
+              })
+            counter++
+        })
+
+        let steps = 500
+        let dataAnimasi
+        let dataRute
+        document.getElementById("tombolEksekusi").addEventListener('click',()=>{
+            if(klik()){
+                dataAnimasi = myMap.getSource('animasi')._data
+                dataRute = myMap.getSource('directions')._data
+                console.log(dataRute)
+                counter = 0
+                //animate()
+            }else{
+                myMap.getSource('directions').setData({
+                    'type' : 'Feature',
+                    'geometry' :{
+                        'type' :'LineString', 
+                        'coordinates' : []
+                    } ,
+                    
+                })
+                myMap.getSource('animasi').setData({
+                    'type': 'FeatureCollection',
+                    'features': [
+                        {
+                            'type': 'Feature',
+                            'properties': {},
+                            'geometry': {
+                                'type': 'Point',
+                                'coordinates': []
+                            }
+                        }
+                    ]                
+                })
+            }
+        })
+
+        function animate(){
+            //for(let y=0; y < myGraf.getHaversine({lat:dataRute.geometry.coordinates[1][1] , long:dataRute.geometry.coordinates[1][0]},{lat:dataRute.geometry.coordinates[0][1], long:dataRute.geometry.coordinates[0][0]}) y = y+(lid))
+        
+            let start =  dataRute.geometry.coordinates[counter >= steps ? counter-1 : counter]
+            let end = dataRute.geometry.coordinates[counter >= steps ? counter : counter+1]
+            if(!start||!end) return;
+            dataAnimasi.features[0].geometry.coordinates = dataRute.geometry.coordinates[counter]
+            dataAnimasi.features[0].properties.bearing = turf.bearing(turf.point(start), turf.point(end))
+            if(counter<steps){
+                requestAnimationFrame(animate)
+            }
+            counter++
+        }
     })
-
-
-
 }
 
 function setComboBox(){
@@ -192,16 +292,36 @@ function setDirectionOnMap(listOfPassedNodes, start, end){
         }
     }
 
+    let initAnimasi = {
+        'type': 'FeatureCollection',
+        'features': [
+            {
+                'type': 'Feature',
+                'properties': {},
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': []
+                }
+            }
+        ]                
+    }
+    const st_point = myGraf.getNodebyValue(start)
+    const end_point = myGraf.getNodebyValue(end)
+    initAnimasi.features[0].geometry.coordinates.push(st_point.long)
+    initAnimasi.features[0].geometry.coordinates.push(st_point.lat)
     listOfPassedNodes.forEach((node)=>{
         dir.geometry.coordinates.push(
             [myGraf.getNodebyValue(node).long,myGraf.getNodebyValue(node).lat]
         )
     })
     myMap.getSource('directions').setData(dir)
+    myMap.getSource('animasi').setData(initAnimasi)
 }
 
 document.getElementById("depatureNode").addEventListener("change",function(){
     document.getElementById("destinationNode").innerHTML = ""
+    dept = ""
+    dest = ""
     if(this.value!='0'){
         dept = String(this.value).replace('\n','').trim()
         dest = ""
@@ -217,7 +337,8 @@ document.getElementById("depatureNode").addEventListener("change",function(){
     }
 },false)
 
-document.getElementById("destinationNode").addEventListener("change",function(){ 
+document.getElementById("destinationNode").addEventListener("change",function(){
+    dest = "" 
     if(this.value!='0'){
         dest = String(this.value).replace('\n','').trim()
         let tmp = ""
@@ -355,4 +476,3 @@ function sumJarak(rute){
     }
     return s
 }
-

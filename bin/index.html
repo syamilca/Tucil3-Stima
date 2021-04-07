@@ -20,29 +20,38 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
   
-<body style="padding: 25px;">
+<body style="padding-left: 25px; padding-right: 25px; padding-top: 20px;">
     <div class="row">
         <div class="col-sm-4">
             <div class="row">
-                <div class="card" style="padding-top: 15px; padding-left: 15px; padding-right: 15px; padding-bottom: 5px;">
-                    <h4>Mencari Jalan dengan Algoritma A*</h4>
-                    <input type="file" name="inputfile" id="inputfile">
-                    <label></label>depature point : </label>
-                    <select style="margin-top: 10px;" name = "depatureNode" id = "depatureNode" >
-                    </select>
-                    <label></label>destination point : </label>
-                    <select name = "destinationNode" id = "destinationNode" >
-                    </select>
-                    <br>
-                    <button class = "btn btn-primary" type="button" onclick="klik()" >cari rute terdekat !</button>
-                    <br>
-                    
-                    <br>
+                <div class="col-sm-12">
+                    <div class="card" style="padding-top: 15px; padding-left: 10px; padding-right: 10px; padding-bottom: 5px;">
+                        <h4>Mencari Jalan dengan Algoritma A*</h4>
+                        <input type="file" name="inputfile" id="inputfile">
+                        <label></label>depature point : </label>
+                        <select style="margin-top: 10px;" name = "depatureNode" id = "depatureNode" >
+                        </select>
+                        <label></label>destination point : </label>
+                        <select name = "destinationNode" id = "destinationNode" >
+                        </select>
+                        <br>
+                        <button class = "btn btn-primary" id="tombolEksekusi" type="button" >cari rute terdekat !</button>
+                        <br>
+                        
+                        <br>
+                    </div>
                 </div>
             </div>
             <div class="row">
-                <div class="card" style="margin-top: 24px; padding-top: 15px; padding-left: 15px; padding-bottom: 5px; padding-right: 15px;"> 
-                    <pre id="output"></pre>
+                <div class="col-sm-12">
+                    <div class="card" style="margin-top: 24px; ">
+                        <div class="card-header">
+                            <h6>Hasil A*</h6>
+                        </div> 
+                        <div id="output" class="card-body" style="padding-top: 15px; padding-left: 15px; padding-bottom: 5px; padding-right: 15px;">
+
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -56,22 +65,24 @@
             </div>
         </div>
         <div class="col-sm-3">
-            <div class="card-header">
-                <h6>Tabel Heuristik</h6>
-            </div>
-            <div class="card" style="padding:5px; max-height: 450px;">
-                <strong>tujuan : </strong>
-                <pre id="tujuanSaya"></pre>
-                <table class="table" style="table-layout: fixed; width: 100%; overflow: scroll; max-height: 400px;">
-                    <thead>
-                      <tr>
-                        <th scope="col">Node</th>
-                        <th scope="col">jarak (meter)</th>
-                      </tr>
-                    </thead>
-                    <tbody id="daftarHeuristik">
-                    </tbody>
-                  </table>
+            <div class="card">
+                <div class="card-header">
+                    <h6>Tabel Heuristik</h6>
+                </div>
+                <div class="card-body" style="padding:5px; max-height: 450px;overflow: scroll;">
+                    <strong>tujuan : </strong>
+                    <pre id="tujuanSaya"></pre>
+                    <table class="table" style="table-layout: fixed; width: 100%; max-height: 400px;">
+                        <thead>
+                        <tr>
+                            <th scope="col">Node</th>
+                            <th scope="col">jarak (meter)</th>
+                        </tr>
+                        </thead>
+                        <tbody id="daftarHeuristik">
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
