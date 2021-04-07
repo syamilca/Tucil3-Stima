@@ -1,7 +1,7 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoiaGFmaWRhYmkiLCJhIjoiY2tuNXZ2N25uMDg1MjJyczlna3VndmFmNSJ9.VKoc34AfkqZ5uUUODIUBVA'
 let dept = ""
 let dest = ""
-let myGraf = new Graph()
+let myGraf
 let directionAddedFlag = false
 let myMap
 
@@ -9,6 +9,7 @@ function bacaTxt(result){
     let temp = []
     temp.push.apply(temp,result.split('\n'));
     if(!isNaN(temp[0]) && temp.length == (2*Number(temp[0]))+1){
+        myGraf = new Graph()
         let nNode = Number(temp[0])
         
         let i
@@ -47,11 +48,23 @@ function klik(){
             haha = a_star(dept,dest)
             setDirectionOnMap(haha.rute,dept,dest)
             document.getElementById("output").innerHTML = haha.rute+"<br>jarak = "+haha.totalJarak
-            
             let tampilKeun = '<strong>total distance = '+haha.totalJarak.toFixed(2)+' m</strong><ol class="list-group list-group-numbered">'
             const warna = ["list-group-item-primary","list-group-item-danger","list-group-item-warning","list-group-item-success"]
+            let jartem = 0
             for(let x =0; x<haha.rute.length;x++){
-                let tmp = '<li href="#" class="list-group-item ' + warna[x%4] + '">'+ '<div class="ms-2 me-auto"><div class="fw-bold">'+ (x+1)+'. '+haha.rute[x] +'</div>'+ haha.rute[x] +'</div>' +'</li>'
+                let jarak = 0
+                if(x>0){
+                    let node1 = myGraf.getNodebyValue(haha.rute[x])
+                    let node2 = myGraf.getNodebyValue(haha.rute[x-1])
+                    jarak = myGraf.getHaversine({lat:node1.lat,long:node1.long},{lat:node2.lat,long:node2.long})
+                    jartem = jartem+jarak
+                }
+                let tmp = '<li href="#" class="list-group-item ' + warna[x%4] + '">'+ '<div class="ms-2 me-auto"><div class="fw-bold"><strong>'+ (x+1)+'. '+haha.rute[x] +'</strong></div>'
+                if(x!=haha.rute.length-1){
+                    tmp = tmp + tampilinDetail(haha.rute[x],jartem,haha.rute[x+1]) +'</div>' +'</li>'
+                }else{
+                    tmp = tmp +'</div>' +'</li>'
+                }
                 tampilKeun = tampilKeun + tmp
             }
 
@@ -62,6 +75,26 @@ function klik(){
         }
     }
     return false
+}
+
+/**
+ * 
+ * @param {String} poin 
+ * @param {Number} prevdist
+ */
+function tampilinDetail(poin,prevdist,selected){
+    let res = ""
+    let heu = myGraf.getHeuristicArray(dest)
+    let n = myGraf.getNodebyValue(poin)
+    for(let i =0 ; i<n.friends.length ; i++){
+        const temen = n.friends[i]
+        if(temen.value==selected){
+            res = res + "<u>" + temen.value + " => " + prevdist.toFixed(2) + " + " + temen.jarak.toFixed(2) + " + " + heu[temen.value].toFixed(2) + " = " + (temen.jarak+prevdist+heu[temen.value]).toFixed(2) + "</u><br>" 
+        }else{
+            res = res + temen.value + " => " + prevdist.toFixed(2) + " + " + temen.jarak.toFixed(2) + " + " + heu[temen.value].toFixed(2) + " = " + (temen.jarak+prevdist+heu[temen.value]).toFixed(2) + "<br>" 
+        }
+    }
+    return res
 }
 
 function muatPeta2(){
@@ -133,8 +166,7 @@ function muatPeta2(){
                     'coordinates' : []
                 } ,
                 
-            }
-        })
+            }})
         //LAYER UNTUK RUTE DARI TITIK A KE TITIK B
         myMap.addLayer({
             'id': 'directions',
@@ -223,16 +255,38 @@ function muatPeta2(){
             counter++
         })
 
-        let steps = 500
+        let steps = 300
         let dataAnimasi
         let dataRute
+        let arc = []
+        let linedist = 0
         document.getElementById("tombolEksekusi").addEventListener('click',()=>{
             if(klik()){
                 dataAnimasi = myMap.getSource('animasi')._data
                 dataRute = myMap.getSource('directions')._data
                 console.log(dataRute)
                 counter = 0
-                //animate()
+                arc = []
+                let start = {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": dataRute.geometry.coordinates[0]
+                    }
+                }
+                let finish = {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": dataRute.geometry.coordinates[dataRute.geometry.coordinates.length-1]
+                    }
+                }
+                var sliced = turf.lineSlice(start, finish, dataRute)
+                linedist = turf.lineDistance(sliced,'kilometers')
+                dataRute = sliced
+                animate()
             }else{
                 myMap.getSource('directions').setData({
                     'type' : 'Feature',
@@ -259,16 +313,26 @@ function muatPeta2(){
         })
 
         function animate(){
-            //for(let y=0; y < myGraf.getHaversine({lat:dataRute.geometry.coordinates[1][1] , long:dataRute.geometry.coordinates[1][0]},{lat:dataRute.geometry.coordinates[0][1], long:dataRute.geometry.coordinates[0][0]}) y = y+(lid))
-        
+            for(let y=0; y < linedist ; y = y+(linedist/steps)){
+                //console.log(y)
+                let segment = turf.along(dataRute,y)
+                arc.push(segment.geometry.coordinates)
+            }
+            dataRute.geometry.coordinates = arc
             let start =  dataRute.geometry.coordinates[counter >= steps ? counter-1 : counter]
             let end = dataRute.geometry.coordinates[counter >= steps ? counter : counter+1]
+            console.log(start)
+            console.log(end)
             if(!start||!end) return;
             dataAnimasi.features[0].geometry.coordinates = dataRute.geometry.coordinates[counter]
             dataAnimasi.features[0].properties.bearing = turf.bearing(turf.point(start), turf.point(end))
+
+            myMap.getSource('animasi').setData(dataAnimasi)
+
             if(counter<steps){
                 requestAnimationFrame(animate)
             }
+            console.log(counter)
             counter++
         }
     })
@@ -289,7 +353,8 @@ function setDirectionOnMap(listOfPassedNodes, start, end){
         'geometry' :{
             'type' :'LineString', 
             'coordinates' : []
-        }
+        } ,
+        
     }
 
     let initAnimasi = {
@@ -310,9 +375,7 @@ function setDirectionOnMap(listOfPassedNodes, start, end){
     initAnimasi.features[0].geometry.coordinates.push(st_point.long)
     initAnimasi.features[0].geometry.coordinates.push(st_point.lat)
     listOfPassedNodes.forEach((node)=>{
-        dir.geometry.coordinates.push(
-            [myGraf.getNodebyValue(node).long,myGraf.getNodebyValue(node).lat]
-        )
+        dir.geometry.coordinates.push([myGraf.getNodebyValue(node).long,myGraf.getNodebyValue(node).lat])
     })
     myMap.getSource('directions').setData(dir)
     myMap.getSource('animasi').setData(initAnimasi)
