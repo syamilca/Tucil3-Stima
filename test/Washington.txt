@@ -1,0 +1,21 @@
+10
+38.896785 -77.036453 The_White_House
+38.889329 -77.010177 US_Capitol
+38.902171 -77.050505 Washington_Statue
+38.888881 -77.051049 Lincoln_Memorial
+38.872701 -77.008975 Nationals_Park
+38.927784 -77.014481 MedStar_Washington_Hospital
+38.929299 -77.069620 Washington_National_Cathedral
+38.942807 -77.051420 Hilwood_Estate
+38.936285 -76.998650 Catholic_University_of_America
+38.908396 -76.998127 Union_Market
+0 1 1 1 0 1 0 1 0 1
+1 0 0 1 1 1 0 0 0 1
+1 0 0 1 0 1 1 1 0 0
+1 1 1 0 1 0 0 0 0 0
+0 1 0 1 0 0 0 0 0 0
+1 1 1 0 0 0 1 1 1 1
+0 0 1 0 0 1 0 1 0 0
+1 0 1 0 0 1 1 0 1 0
+0 0 0 0 0 1 0 1 0 1
+1 1 0 0 0 1 0 0 1 0
